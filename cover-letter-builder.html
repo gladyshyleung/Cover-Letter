@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cover Letter Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --slate: #3b5068;
+    --slate-light: #4e6b87;
+    --slate-pale: #e8eef4;
+    --slate-border: #c8d6e2;
+    --warm-white: #f9f7f5;
+    --white: #ffffff;
+    --ink: #1e2d3d;
+    --ink-mid: #4a5f72;
+    --ink-soft: #7a92a6;
+    --accent: #6b9ab8;
+    --accent-light: #d4e6f1;
+    --green: #4a8c6f;
+    --green-light: #d8efe6;
+    --amber: #b07d2e;
+    --amber-light: #fef3dc;
+    --red: #c0392b;
+    --red-light: #fde8e6;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--warm-white);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  header {
+    background: var(--slate);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .header-right span { font-size: 12px; opacity: 0.65; font-weight: 400; }
+  .sync-status {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.85);
+  }
+  .sync-status.saved { background: rgba(74,140,111,0.4); color: #b8f0d8; }
+  .sync-status.unsaved { background: rgba(176,125,46,0.4); color: #ffd98a; }
+
+  .tabs {
+    display: flex;
+    background: var(--slate);
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .tab {
+    flex: 1;
+    padding: 11px 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .tab.active { color: white; border-bottom-color: #9fc8e2; }
+
+  main { padding: 16px; max-width: 680px; margin: 0 auto; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--slate-border);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ── Info banner ── */
+  .banner {
+    border-radius: var(--radius);
+    padding: 13px 15px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .banner-blue { background: var(--accent-light); border: 1px solid #aacfe6; color: #1d4f6b; }
+  .banner-amber { background: var(--amber-light); border: 1px solid #e8c97a; color: #7a5010; }
+  .banner-green { background: var(--green-light); border: 1px solid #8ecdb0; color: #1e5a3e; }
+  .banner strong { font-weight: 600; }
+  .banner-dismiss {
+    float: right;
+    margin-left: 10px;
+    opacity: 0.5;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+  }
+  .banner-dismiss:hover { opacity: 0.9; }
+
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--ink-mid); margin-bottom: 5px; }
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--slate-border);
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--white);
+    transition: border-color 0.15s;
+    outline: none;
+    appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+  }
+  textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a5f72' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-primary { background: var(--slate); color: white; }
+  .btn-primary:hover { background: var(--slate-light); }
+  .btn-danger { background: var(--red-light); color: var(--red); border: 1px solid #f5c6c2; }
+  .btn-danger:hover { background: #fbd5d2; }
+  .btn-ghost { background: transparent; color: var(--ink-mid); border: 1.5px solid var(--slate-border); }
+  .btn-ghost:hover { background: var(--slate-pale); }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #3d7a60; }
+  .btn-amber { background: var(--amber); color: white; }
+  .btn-amber:hover { background: #9a6d24; }
+  .btn-sm { padding: 7px 12px; font-size: 13px; }
+  .btn-full { width: 100%; justify-content: center; }
+
+  .entry-card {
+    background: var(--white);
+    border: 1px solid var(--slate-border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow-sm);
+  }
+  .entry-meta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .entry-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.2px;
+  }
+  .tag-position { background: var(--slate-pale); color: var(--slate); }
+  .tag-criteria { background: var(--accent-light); color: #2d6b8f; }
+  .entry-text {
+    font-family: 'Lora', serif;
+    font-size: 13.5px;
+    color: var(--ink-mid);
+    line-height: 1.65;
+  }
+  .entry-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .builder-controls { display: grid; gap: 12px; }
+  .criteria-list { display: flex; flex-direction: column; gap: 8px; }
+  .criteria-row { display: flex; gap: 8px; align-items: center; }
+  .criteria-row select { flex: 1; }
+
+  .draft-output {
+    background: var(--white);
+    border: 1.5px solid var(--slate-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-top: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .draft-output h3 {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--slate-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .draft-para {
+    font-family: 'Lora', serif;
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  .draft-para:last-child { margin-bottom: 0; }
+  .draft-empty {
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: center;
+    padding: 24px 0;
+    font-style: italic;
+  }
+
+  /* Sync panel */
+  .sync-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sync-btn-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .sync-btn-wrap .btn { justify-content: center; }
+  .sync-label { font-size: 11px; color: var(--ink-soft); text-align: center; }
+  .divider { border: none; border-top: 1px solid var(--slate-border); margin: 16px 0; }
+
+  /* Steps list */
+  .steps { list-style: none; counter-reset: steps; display: flex; flex-direction: column; gap: 8px; }
+  .steps li {
+    counter-increment: steps;
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink-mid);
+    line-height: 1.5;
+  }
+  .steps li::before {
+    content: counter(steps);
+    min-width: 22px;
+    height: 22px;
+    background: var(--slate);
+    color: white;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 999;
+    transition: transform 0.25s ease;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-bar select { flex: 1; min-width: 130px; }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--ink-soft); }
+  .empty-state .icon { font-size: 36px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  .add-criteria-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .add-criteria-btn:hover { color: var(--slate); }
+
+  .no-results { font-size: 13px; color: var(--ink-soft); text-align: center; padding: 16px; font-style: italic; }
+  .char-count { font-size: 11px; color: var(--ink-soft); text-align: right; margin-top: 4px; }
+  .row-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Cover Letter Builder</h1>
+    <span id="entry-count">0 entries</span>
+  </div>
+  <div class="header-right">
+    <div class="sync-status" id="sync-status">●&nbsp; Local</div>
+  </div>
+</header>
+<div class="tabs">
+  <div class="tab active" onclick="showView('database')">Database</div>
+  <div class="tab" onclick="showView('add')">Add Entry</div>
+  <div class="tab" onclick="showView('draft')">Draft</div>
+  <div class="tab" onclick="showView('sync')">Sync</div>
+</div>
+
+<main>
+
+  <!-- ── DATABASE ── -->
+  <div class="view active" id="view-database">
+    <div class="section-label">Filter</div>
+    <div class="filter-bar">
+      <select id="filter-position" onchange="renderDatabase()">
+        <option value="">All positions</option>
+      </select>
+      <select id="filter-criteria" onchange="renderDatabase()">
+        <option value="">All criteria</option>
+      </select>
+    </div>
+    <div id="database-list"></div>
+  </div>
+
+  <!-- ── ADD / EDIT ── -->
+  <div class="view" id="view-add">
+    <div class="card">
+      <div class="field">
+        <label>Position</label>
+        <input type="text" id="add-position" list="positions-list" placeholder="e.g. Assistant Psychologist">
+        <datalist id="positions-list"></datalist>
+      </div>
+      <div class="field">
+        <label>Criteria</label>
+        <input type="text" id="add-criteria" list="criteria-list" placeholder="e.g. Communication skills">
+        <datalist id="criteria-list"></datalist>
+      </div>
+      <div class="field">
+        <label>Detail (1–3 paragraphs)</label>
+        <textarea id="add-detail" placeholder="Write your paragraph(s) here. Separate paragraphs with a blank line." oninput="updateCharCount()"></textarea>
+        <div class="char-count" id="char-count">0 characters</div>
+      </div>
+      <div class="row-btns">
+        <button class="btn btn-primary" onclick="saveEntry()">Save Entry</button>
+        <button class="btn btn-ghost" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none">Cancel Edit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DRAFT ── -->
+  <div class="view" id="view-draft">
+    <div class="card builder-controls">
+      <div class="field">
+        <label>Position</label>
+        <select id="draft-position" onchange="updateDraftCriteriaOptions()">
+          <option value="">Select position…</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Criteria (in order)</label>
+        <div class="criteria-list" id="criteria-rows"></div>
+        <button class="add-criteria-btn" onclick="addCriteriaRow()">＋ Add criteria</button>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="generateDraft()">Generate Draft</button>
+    </div>
+
+    <div class="draft-output" id="draft-output" style="display:none">
+      <h3>
+        Draft Letter
+        <button class="btn btn-sm btn-ghost" onclick="copyDraft()">Copy</button>
+      </h3>
+      <div id="draft-content"></div>
+    </div>
+  </div>
+
+  <!-- ── SYNC ── -->
+  <div class="view" id="view-sync">
+
+    <div class="banner banner-blue" id="setup-banner">
+      <span class="banner-dismiss" onclick="this.parentElement.style.display='none'">✕</span>
+      <strong>iCloud Drive setup (do once)</strong><br>
+      <ol class="steps" style="margin-top:10px">
+        <li>On your Mac, move this HTML file into <strong>iCloud Drive</strong> — e.g. a folder called <em>Cover Letter Builder</em>.</li>
+        <li>On iPhone, open the <strong>Files app</strong> → iCloud Drive → find the file → tap to open in Safari.</li>
+        <li>In Safari, tap <strong>Share → Add to Home Screen</strong> for quick access.</li>
+        <li>Each time you make changes, use <strong>Save to iCloud</strong> below to keep both devices in sync.</li>
+      </ol>
+    </div>
+
+    <div class="section-label">Save your database</div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--ink-mid);margin-bottom:14px;line-height:1.55">
+        Download your database as a <code style="background:var(--slate-pale);padding:1px 5px;border-radius:3px;font-size:12px">cover-letter-data.json</code> file. Replace the old file in iCloud Drive to sync across devices.
+      </p>
+      <button class="btn btn-green btn-full" onclick="exportJSON()">⬇ Save to iCloud Drive</button>
+    </div>
+
+    <div class="section-label">Load a saved database</div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--ink-mid);margin-bottom:14px;line-height:1.55">
+        Open your <code style="background:var(--slate-pale);padding:1px 5px;border-radius:3px;font-size:12px">cover-letter-data.json</code> from iCloud Drive to load your latest entries. Your current data will be replaced.
+      </p>
+      <label for="import-file" class="btn btn-primary btn-full" style="cursor:pointer;text-align:center;justify-content:center">
+        ⬆ Load from iCloud Drive
+      </label>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(event)">
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-label">Danger zone</div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--ink-mid);margin-bottom:14px;line-height:1.55">
+        Clear all entries from this device. Make sure you've saved to iCloud first.
+      </p>
+      <button class="btn btn-danger btn-full" onclick="clearAll()">Clear all entries on this device</button>
+    </div>
+
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──
+let db = JSON.parse(localStorage.getItem('clb_entries') || '[]');
+let editingId = null;
+let unsaved = false;
+
+function persist() {
+  localStorage.setItem('clb_entries', JSON.stringify(db));
+}
+
+function save() {
+  persist();
+  markUnsaved();
+  updateEntryCount();
+  populateDataLists();
+  populateDraftPositions();
+  renderDatabase();
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+// ── Sync status ──
+function markUnsaved() {
+  unsaved = true;
+  const el = document.getElementById('sync-status');
+  el.textContent = '● Unsaved';
+  el.className = 'sync-status unsaved';
+}
+function markSaved() {
+  unsaved = false;
+  const el = document.getElementById('sync-status');
+  el.textContent = '● Saved';
+  el.className = 'sync-status saved';
+  setTimeout(() => {
+    if (!unsaved) {
+      el.textContent = '● Local';
+      el.className = 'sync-status';
+    }
+  }, 3000);
+}
+
+// ── Export / Import ──
+function exportJSON() {
+  const data = JSON.stringify({ version: 1, entries: db }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cover-letter-data.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  markSaved();
+  showToast('Saved! Replace the file in iCloud Drive.');
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      const entries = parsed.entries || parsed; // support both formats
+      if (!Array.isArray(entries)) throw new Error('Invalid format');
+      db = entries;
+      persist();
+      updateEntryCount();
+      populateDataLists();
+      populateDraftPositions();
+      renderDatabase();
+      markSaved();
+      showToast(`Loaded ${db.length} entries from file.`);
+    } catch {
+      showToast('Could not read file. Is it a valid database?');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function clearAll() {
+  if (!confirm(`Delete all ${db.length} entries on this device? Make sure you've saved to iCloud first.`)) return;
+  db = [];
+  persist();
+  updateEntryCount();
+  populateDataLists();
+  populateDraftPositions();
+  renderDatabase();
+  showToast('All entries cleared.');
+}
+
+// ── Counts ──
+function updateEntryCount() {
+  document.getElementById('entry-count').textContent = `${db.length} entr${db.length === 1 ? 'y' : 'ies'}`;
+}
+
+// ── DataLists & Dropdowns ──
+function allPositions() { return [...new Set(db.map(e => e.position))].sort(); }
+function allCriteria() { return [...new Set(db.map(e => e.criteria))].sort(); }
+
+function populateDataLists() {
+  document.getElementById('positions-list').innerHTML = allPositions().map(p => `<option value="${esc(p)}">`).join('');
+  document.getElementById('criteria-list').innerHTML = allCriteria().map(c => `<option value="${esc(c)}">`).join('');
+
+  const fp = document.getElementById('filter-position');
+  const fc = document.getElementById('filter-criteria');
+  const curP = fp.value, curC = fc.value;
+  fp.innerHTML = '<option value="">All positions</option>' + allPositions().map(p => `<option value="${esc(p)}"${p===curP?' selected':''}>${esc(p)}</option>`).join('');
+  fc.innerHTML = '<option value="">All criteria</option>' + allCriteria().map(c => `<option value="${esc(c)}"${c===curC?' selected':''}>${esc(c)}</option>`).join('');
+}
+
+function populateDraftPositions() {
+  const sel = document.getElementById('draft-position');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Select position…</option>' + allPositions().map(p => `<option value="${esc(p)}"${p===cur?' selected':''}>${esc(p)}</option>`).join('');
+}
+
+// ── Database View ──
+function renderDatabase() {
+  const filterPos = document.getElementById('filter-position').value;
+  const filterCrit = document.getElementById('filter-criteria').value;
+  const entries = db.filter(e =>
+    (!filterPos || e.position === filterPos) &&
+    (!filterCrit || e.criteria === filterCrit)
+  );
+
+  const list = document.getElementById('database-list');
+  if (entries.length === 0) {
+    list.innerHTML = db.length === 0
+      ? `<div class="empty-state"><div class="icon">📝</div><p>No entries yet. Use <strong>Add Entry</strong> to get started.</p></div>`
+      : `<div class="no-results">No entries match this filter.</div>`;
+    return;
+  }
+
+  list.innerHTML = entries.map(e => `
+    <div class="entry-card" id="card-${e.id}">
+      <div class="entry-meta">
+        <div class="entry-tags">
+          <span class="tag tag-position">${esc(e.position)}</span>
+          <span class="tag tag-criteria">${esc(e.criteria)}</span>
+        </div>
+        <div class="entry-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editEntry('${e.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteEntry('${e.id}')">Delete</button>
+        </div>
+      </div>
+      <div class="entry-text">${formatParas(e.detail)}</div>
+    </div>
+  `).join('');
+}
+
+// ── Add / Edit ──
+function saveEntry() {
+  const position = document.getElementById('add-position').value.trim();
+  const criteria = document.getElementById('add-criteria').value.trim();
+  const detail = document.getElementById('add-detail').value.trim();
+
+  if (!position || !criteria || !detail) { showToast('Please fill in all fields.'); return; }
+
+  if (editingId) {
+    const idx = db.findIndex(e => e.id === editingId);
+    if (idx !== -1) db[idx] = { id: editingId, position, criteria, detail };
+    editingId = null;
+    document.getElementById('cancel-edit-btn').style.display = 'none';
+    showToast('Entry updated.');
+  } else {
+    db.push({ id: uid(), position, criteria, detail });
+    showToast('Entry saved.');
+  }
+
+  document.getElementById('add-position').value = '';
+  document.getElementById('add-criteria').value = '';
+  document.getElementById('add-detail').value = '';
+  document.getElementById('char-count').textContent = '0 characters';
+  save();
+  showView('database');
+}
+
+function editEntry(id) {
+  const e = db.find(x => x.id === id);
+  if (!e) return;
+  editingId = id;
+  document.getElementById('add-position').value = e.position;
+  document.getElementById('add-criteria').value = e.criteria;
+  document.getElementById('add-detail').value = e.detail;
+  document.getElementById('char-count').textContent = `${e.detail.length} characters`;
+  document.getElementById('cancel-edit-btn').style.display = 'inline-flex';
+  showView('add');
+}
+
+function cancelEdit() {
+  editingId = null;
+  document.getElementById('add-position').value = '';
+  document.getElementById('add-criteria').value = '';
+  document.getElementById('add-detail').value = '';
+  document.getElementById('char-count').textContent = '0 characters';
+  document.getElementById('cancel-edit-btn').style.display = 'none';
+}
+
+function deleteEntry(id) {
+  if (!confirm('Delete this entry?')) return;
+  db = db.filter(e => e.id !== id);
+  save();
+  showToast('Entry deleted.');
+}
+
+function updateCharCount() {
+  document.getElementById('char-count').textContent = `${document.getElementById('add-detail').value.length} characters`;
+}
+
+// ── Draft Builder ──
+function addCriteriaRow(selected = '') {
+  const pos = document.getElementById('draft-position').value;
+  const criteria = pos
+    ? [...new Set(db.filter(e => e.position === pos).map(e => e.criteria))].sort()
+    : allCriteria();
+
+  const row = document.createElement('div');
+  row.className = 'criteria-row';
+  row.innerHTML = `
+    <select onchange="generateDraft()">${criteriaOptions(criteria, selected)}</select>
+    <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove(); generateDraft()">✕</button>
+  `;
+  document.getElementById('criteria-rows').appendChild(row);
+  generateDraft();
+}
+
+function criteriaOptions(criteria, selected = '') {
+  return '<option value="">Choose criteria…</option>' +
+    criteria.map(c => `<option value="${esc(c)}"${c===selected?' selected':''}>${esc(c)}</option>`).join('');
+}
+
+function updateDraftCriteriaOptions() {
+  const pos = document.getElementById('draft-position').value;
+  const criteria = pos
+    ? [...new Set(db.filter(e => e.position === pos).map(e => e.criteria))].sort()
+    : allCriteria();
+  document.getElementById('criteria-rows').querySelectorAll('select').forEach(sel => {
+    const cur = sel.value;
+    sel.innerHTML = criteriaOptions(criteria, cur);
+  });
+  generateDraft();
+}
+
+function generateDraft() {
+  const pos = document.getElementById('draft-position').value;
+  if (!pos) { document.getElementById('draft-output').style.display = 'none'; return; }
+
+  const rows = [...document.getElementById('criteria-rows').querySelectorAll('select')];
+  const selected = rows.map(s => s.value).filter(Boolean);
+  const content = document.getElementById('draft-content');
+  const output = document.getElementById('draft-output');
+
+  if (selected.length === 0) {
+    content.innerHTML = '<div class="draft-empty">Select at least one criteria to build your draft.</div>';
+    output.style.display = 'block';
+    return;
+  }
+
+  const paras = [];
+  selected.forEach(crit => {
+    const match = db.find(e => e.position === pos && e.criteria === crit);
+    if (match) {
+      match.detail.split(/\n\s*\n/).forEach(p => {
+        const trimmed = p.trim();
+        if (trimmed) paras.push(trimmed);
+      });
+    }
+  });
+
+  content.innerHTML = paras.length === 0
+    ? '<div class="draft-empty">No entries found for this combination.</div>'
+    : paras.map(p => `<p class="draft-para">${esc(p)}</p>`).join('');
+  output.style.display = 'block';
+}
+
+function copyDraft() {
+  const paras = [...document.querySelectorAll('.draft-para')].map(p => p.textContent).join('\n\n');
+  if (!paras) return;
+  navigator.clipboard.writeText(paras).then(() => showToast('Copied to clipboard!'));
+}
+
+// ── Helpers ──
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatParas(text) {
+  return text.split(/\n\s*\n/).map(p => `<p style="margin-bottom:8px">${esc(p.trim())}</p>`).join('');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  const tabs = { database: 0, add: 1, draft: 2, sync: 3 };
+  document.querySelectorAll('.tab')[tabs[name]].classList.add('active');
+  if (name === 'add' && !editingId) cancelEdit();
+}
+
+function init() {
+  updateEntryCount();
+  populateDataLists();
+  populateDraftPositions();
+  renderDatabase();
+  addCriteriaRow();
+}
+
+init();
+</script>
+</body>
+</html>
